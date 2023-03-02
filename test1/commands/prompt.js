@@ -13,6 +13,7 @@ module.exports = {
       option.setName('input')
       .setDescription('The input')),
   async execute(interaction) {
+    const msg = await interaction.deferReply();
     const prompt = interaction.options.getString('input');
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
@@ -22,7 +23,7 @@ module.exports = {
     });
     console.log(response.data.choices)
     const output = response.data.choices[0].message.content;
-    await interaction.reply(`${output}`);
+    await interaction.editReply(`${output}`);
 
   },
 }

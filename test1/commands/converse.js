@@ -27,10 +27,13 @@ module.exports = {
       option.setName('input')
       .setDescription('The input')),
   async execute(interaction) {
+
     const input = interaction.options.getString('input');
     const user = interaction.user
     const dataPath = path.join(parentPath, "data/chatData/" + user.id)
     let history = []
+    //defer the reply
+    const msg = await interaction.deferReply();
     //check if the file exists or not
     if (fs.existsSync(dataPath)) {
       // File exists
@@ -92,7 +95,7 @@ module.exports = {
       console.error(`Error writing to file ${dataPath}:`, err);
     }
 
-    await interaction.reply(`${output}`);
+    await interaction.editReply(`${user.username}: ${input}\n ${output}`);
 
   },
 }
