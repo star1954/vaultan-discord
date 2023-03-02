@@ -19,6 +19,17 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration)
 console.log(openai.createChatCompletion);
+
+function splitString(str, maxLength) {
+  const substrings = [];
+  for (let i = 0; i < str.length; i += maxLength) {
+    substrings.push(str.substring(i, i + maxLength));
+  }
+  return substrings;
+}
+
+
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('converse')
@@ -27,7 +38,7 @@ module.exports = {
       option.setName('input')
       .setDescription('The input')),
   async execute(interaction) {
-
+    const channel = interaction.channel
     const input = interaction.options.getString('input');
     const user = interaction.user
     const dataPath = path.join(parentPath, "data/chatData/" + user.id)
@@ -76,10 +87,10 @@ module.exports = {
       model: "gpt-3.5-turbo",
       messages: prompt
     });
-    if (response.data.choices[0].message.content.length>2000){
-      return
-    }
-    const output = response.data.choices[0].message.content;
+    //limit to 1800 chars
+    const output = splitString(response.data.choices[0].message.content, 1800)
+
+    //const output = response.data.choices[0].message.content;
     // Save the messages to the file
     const newMessage = {
       "role": "assistant",
@@ -98,7 +109,11 @@ module.exports = {
       console.error(`Error writing to file ${dataPath}:`, err);
     }
 
-    await interaction.editReply(`${user.username}: ${input}\n ${output}`);
+    await interaction.editReply(`${user.username}: ${input}`);
+    let len = output.length
+    for (let i = 0; i<len; i++){
+      channel.send(output[i])
+    }
 
   },
 }
