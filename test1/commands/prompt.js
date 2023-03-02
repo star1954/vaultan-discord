@@ -20,12 +20,20 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration)
 console.log(openai.createChatCompletion);
 
-function splitString(str, maxLength) {
-  const substrings = [];
-  for (let i = 0; i < str.length; i += maxLength) {
-    substrings.push(str.substring(i, i + maxLength));
+function splitString(str, maxLength, position, first = []) {
+  let splitIndex = maxLength;
+  const nextNewLine = str.indexOf('\n', position);
+  const nextSpace = str.indexOf(' ', position);
+  if (nextNewLine > position && nextNewLine < splitIndex) {
+    splitIndex = nextNewLine;
+  } else if (nextSpace > position && nextSpace < splitIndex) {
+    splitIndex = nextSpace;
   }
-  return substrings;
+  first.push(str.substring(0,splitIndex))
+  if (str.substring(splitIndex).length>position){
+    first = splitString(str.substring(splitIndex), maxLength, position, first)
+  }
+  return first
 }
 
 
@@ -45,7 +53,6 @@ module.exports = {
     let history = []
     //defer the reply
     const msg = await interaction.deferReply();
-    /*
     //check if the file exists or not
     if (fs.existsSync(dataPath)) {
       // File exists
@@ -58,7 +65,7 @@ module.exports = {
         console.error(`Error creating file ${dataPath}:`, err);
       }
     }
-
+    /*
     // Read the messages from the file
     const contents = await fs.promises.readFile(dataPath, 'utf8');
     // Split the contents of the file into an array of messages
@@ -88,10 +95,11 @@ module.exports = {
       model: "gpt-3.5-turbo",
       messages: prompt
     });
-    //limit to 1800 chars
-    const output = splitString(response.data.choices[0].message.content, 1800)
 
-    /*//const output = response.data.choices[0].message.content;
+    //limit to 1800 chars
+    const output = splitString(response.data.choices[0].message.content, 1900, 1500)
+    /*
+    //const output = response.data.choices[0].message.content;
     // Save the messages to the file
     const newMessage = {
       "role": "assistant",
@@ -108,8 +116,8 @@ module.exports = {
       console.log(`File ${dataPath} updated.`);
     } catch (err) {
       console.error(`Error writing to file ${dataPath}:`, err);
-    }*/
-
+    }
+    */
     await interaction.editReply(`${user.username}: ${input}`);
     let len = output.length
     for (let i = 0; i<len; i++){

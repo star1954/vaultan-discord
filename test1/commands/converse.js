@@ -20,12 +20,20 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration)
 console.log(openai.createChatCompletion);
 
-function splitString(str, maxLength) {
-  const substrings = [];
-  for (let i = 0; i < str.length; i += maxLength) {
-    substrings.push(str.substring(i, i + maxLength));
+function splitString(str, maxLength, position, first = []) {
+  let splitIndex = maxLength;
+  const nextNewLine = str.indexOf('\n', position);
+  const nextSpace = str.indexOf(' ', position);
+  if (nextNewLine > position && nextNewLine < splitIndex) {
+    splitIndex = nextNewLine;
+  } else if (nextSpace > position && nextSpace < splitIndex) {
+    splitIndex = nextSpace;
   }
-  return substrings;
+  first.push(str.substring(0,splitIndex))
+  if (str.substring(splitIndex).length>position){
+    first = splitString(str.substring(splitIndex), maxLength, position, first)
+  }
+  return first
 }
 
 
@@ -87,8 +95,9 @@ module.exports = {
       model: "gpt-3.5-turbo",
       messages: prompt
     });
+
     //limit to 1800 chars
-    const output = splitString(response.data.choices[0].message.content, 1800)
+    const output = splitString(response.data.choices[0].message.content, 1900, 1500)
 
     //const output = response.data.choices[0].message.content;
     // Save the messages to the file
