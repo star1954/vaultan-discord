@@ -1,7 +1,7 @@
 //General stuff
 require('dotenv').config();//load environment variables
-const fs = require('node:fs');
-const path = require('node:path');
+const fs = require('fs');
+const path = require('path');
 
 //Open AI stuff
 const openai = require('openai');
