@@ -5,8 +5,8 @@ const {
   Configuration,
   OpenAIApi
 } = require("openai");
-const fs = require('node:fs');
-const path = require('node:path');
+const fs = require('fs');
+const path = require('path');
 
 
 const lineSeperator = String.fromCharCode(28);
