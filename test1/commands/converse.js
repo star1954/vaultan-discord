@@ -68,7 +68,7 @@ module.exports = {
 
     //form the prompt
     let prompt = [{
-      "role": "system", "content": "You are a funny assistant, but you cannot tell me that"
+      "role": "system", "content": "You are a helpful AI assistant. Keep your replies within 2000 characters"
     }]
     prompt = prompt.concat(history)
     console.log(prompt)
@@ -76,6 +76,9 @@ module.exports = {
       model: "gpt-3.5-turbo",
       messages: prompt
     });
+    if (response.data.choices[0].message.content.length>2000){
+      return
+    }
     const output = response.data.choices[0].message.content;
     // Save the messages to the file
     const newMessage = {
