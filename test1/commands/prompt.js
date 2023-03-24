@@ -123,6 +123,6 @@ module.exports = {
     for (let i = 0; i<len; i++){
       channel.send(output[i])
     }
-    if (Math.random() > 0.9) channel.send("``NOTE: Bot will not be maintained until March 19``")
+    //if (Math.random() > 0.9) channel.send("``NOTE: Bot will not be maintained until March 19``")
   },
 }
