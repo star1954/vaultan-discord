@@ -14,9 +14,9 @@ module.exports = {
   async execute(interaction) {
     const user = interaction.user
     const dataPath = path.join(parentPath, "data/chatData/" + user.id)
-    if (fs.existsSync('foo.txt')) {
+    if (fs.existsSync(dataPath)) {
       fs.unlinkSync(dataPath);
-    }
+    }else print("could not find data file to delete");
 
 
     await interaction.reply(`-_-`);
