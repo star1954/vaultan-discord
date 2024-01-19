@@ -1,5 +1,5 @@
 //Configuration
-const commandName = "mathGPT";
+const commandName = "mathgpt";
 const commandDesc = "Solve math stuff";
 const GPTRole = "You are a helpful AI assistant that specializes in mathematics. You solve problems step by step, and always double check your results";
 const DATAPATH = "data/chatData/";
