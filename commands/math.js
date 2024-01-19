@@ -1,9 +1,9 @@
 //Configuration
-const commandName = "converse";
-const commandDesc = "Talk to ChatGPT";
-const GPTRole = "You are a helpful AI assistant. Keep your replies within 2000 characters";
+const commandName = "mathGPT";
+const commandDesc = "Solve math stuff";
+const GPTRole = "You are a helpful AI assistant that specializes in mathematics. You solve problems step by step, and always double check your results";
 const DATAPATH = "data/chatData/";
-const RememberPrompt = true;
+const RememberPrompt = false;
 
 const {
   SlashCommandBuilder
