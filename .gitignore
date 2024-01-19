@@ -1,3 +1,5 @@
 .env
 node_modules
-*/data/chatData/*.txt
+/data/chatData/*
+package-lock.json
+settings.json
