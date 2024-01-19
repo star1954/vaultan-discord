@@ -1,3 +1,10 @@
+//Configuration
+const commandName = "prompt";
+const commandDesc = "Talk to ChatGPT";
+const GPTRole = "You are a helpful AI assistant. Keep your replies within 2000 characters";
+const DATAPATH = "data/chatData/";
+const RememberPrompt = false;
+
 const {
   SlashCommandBuilder
 } = require('discord.js');
@@ -29,8 +36,8 @@ function splitString(str, maxLength, position, first = []) {
   } else if (nextSpace > position && nextSpace < splitIndex) {
     splitIndex = nextSpace;
   }
-  first.push(str.substring(0,splitIndex))
-  if (str.substring(splitIndex).length>position){
+  first.push(str.substring(0, splitIndex))
+  if (str.substring(splitIndex).length > position) {
     first = splitString(str.substring(splitIndex), maxLength, position, first)
   }
   return first
@@ -40,16 +47,16 @@ function splitString(str, maxLength, position, first = []) {
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('prompt')
-    .setDescription('Talk to ChatGPT')
+    .setName(commandName)
+    .setDescription(commandDesc)
     .addStringOption(option =>
       option.setName('input')
-      .setDescription('The input')),
+        .setDescription('The input')),
   async execute(interaction) {
     const channel = interaction.channel
     const input = interaction.options.getString('input');
     const user = interaction.user
-    const dataPath = path.join(parentPath, "data/chatData/" + user.id)
+    const dataPath = path.join(parentPath, DATAPATH + user.id)
     let history = []
     //defer the reply
     const msg = await interaction.deferReply();
@@ -65,20 +72,22 @@ module.exports = {
         console.error(`Error creating file ${dataPath}:`, err);
       }
     }
-    /*
-    // Read the messages from the file
-    const contents = await fs.promises.readFile(dataPath, 'utf8');
-    // Split the contents of the file into an array of messages
-    const messages = contents.split(lineSeperator);
-    // Parse the messages into an array of objects
-    history = messages.map((message) => {
-      const [role, text] = message.split(messageSeperator);
-      return {
-        role: role,
-        content: text
-      };
-    }).filter((message) => message.role && message.content);
-    */
+    if (RememberPrompt) {
+
+      // Read the messages from the file
+      const contents = await fs.promises.readFile(dataPath, 'utf8');
+      // Split the contents of the file into an array of messages
+      const messages = contents.split(lineSeperator);
+      // Parse the messages into an array of objects
+      history = messages.map((message) => {
+        const [role, text] = message.split(messageSeperator);
+        return {
+          role: role,
+          content: text
+        };
+      }).filter((message) => message.role && message.content);
+
+    }
     //add the input to history
     history.push({
       "role": "user",
@@ -87,7 +96,7 @@ module.exports = {
 
     //form the prompt
     let prompt = [{
-      "role": "system", "content": "You are a helpful AI assistant. Keep your replies within 2000 characters"
+      "role": "system", "content": GPTRole
     }]
     prompt = prompt.concat(history)
     console.log(prompt)
@@ -98,29 +107,32 @@ module.exports = {
 
     //limit to 1800 chars
     const output = splitString(response.data.choices[0].message.content, 1900, 1500)
-    /*
-    //const output = response.data.choices[0].message.content;
-    // Save the messages to the file
-    const newMessage = {
-      "role": "assistant",
-      "content": output
-    }
-    history.push(newMessage)
-    //Map the data back
-    const data = history.map((message) => {
-      return message.role + messageSeperator + message.content;
-    }).join(lineSeperator);
 
-    try {
-      await fs.promises.writeFile(dataPath, data, 'utf8');
-      console.log(`File ${dataPath} updated.`);
-    } catch (err) {
-      console.error(`Error writing to file ${dataPath}:`, err);
+    if (RememberPrompt){
+
+      //const output = response.data.choices[0].message.content;
+      // Save the messages to the file
+      const newMessage = {
+        "role": "assistant",
+        "content": output
+      }
+      history.push(newMessage)
+      //Map the data back
+      const data = history.map((message) => {
+        return message.role + messageSeperator + message.content;
+      }).join(lineSeperator);
+
+      try {
+        await fs.promises.writeFile(dataPath, data, 'utf8');
+        console.log(`File ${dataPath} updated.`);
+      } catch (err) {
+        console.error(`Error writing to file ${dataPath}:`, err);
+      }
+
     }
-    */
     await interaction.editReply(`${user.username}: ${input}`);
     let len = output.length
-    for (let i = 0; i<len; i++){
+    for (let i = 0; i < len; i++) {
       channel.send(output[i])
     }
     //if (Math.random() > 0.9) channel.send("``NOTE: Bot will not be maintained until March 19``")
