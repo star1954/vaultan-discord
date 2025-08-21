@@ -3,9 +3,6 @@ require('dotenv').config();//load environment variables
 const fs = require('fs');
 const path = require('path');
 
-//Open AI stuff
-const openai = require('openai');
-openai.apiKey = process.env.OPENAI_API_KEY;
 
 
 //**************
@@ -18,7 +15,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN)
 //**************
 //Commands
 
-//Loads commands
+//Register the commands
 client.commands = new Collection();
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
